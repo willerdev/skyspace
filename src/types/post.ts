@@ -29,6 +29,7 @@ export interface Post {
   };
   likes?: Like[];
   comments?: Comment[];
+  points?: number;
 }
 
 export interface Tip {

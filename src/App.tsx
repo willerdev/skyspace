@@ -16,6 +16,7 @@ import Chat from './pages/Chat';
 import Explore from './pages/Explore';
 import CreatePost from './pages/CreatePost';
 import ManageProfile from './pages/ManageProfile';
+import Wallet from './pages/Wallet';
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
@@ -37,6 +38,7 @@ function AppContent() {
         <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
         <Route path="/explore" element={<PrivateRoute><Explore /></PrivateRoute>} />
         <Route path="/create" element={<PrivateRoute><CreatePost /></PrivateRoute>} />
+        <Route path="/wallet" element={<Wallet />} />
       </Routes>
       {isAuthenticated && <BottomNav />}
     </>

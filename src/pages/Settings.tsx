@@ -9,8 +9,12 @@ import {
   Mail, 
   FileText,
   ChevronRight,
-  ArrowLeft
+  ArrowLeft,
+  User,
+  Gift
 } from 'lucide-react';
+import PointsTopup from './Settings/PointsTopup';
+import { useState } from 'react';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -38,6 +42,7 @@ function MenuItem({ icon, title, onClick }: MenuItemProps) {
 export default function Settings() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<string>('menu');
 
   const handleLogout = () => {
     logout();
@@ -74,8 +79,26 @@ export default function Settings() {
       icon: <FileText className="w-5 h-5" />,
       title: "Terms and Conditions",
       onClick: () => console.log("Terms clicked")
+    },
+    {
+      icon: <User className="w-5 h-5" />,
+      title: "Profile",
+      onClick: () => navigate('/manage-profile')
+    },
+    {
+      icon: <Gift className="w-5 h-5" />,
+      title: "Points",
+      onClick: () => setActiveSection('points')
     }
   ];
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'points':
+        return <PointsTopup isOpen={true} onClose={() => setActiveSection('menu')} />;
+      // ... other cases
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -101,17 +124,15 @@ export default function Settings() {
 
       <main className="pt-14 pb-16 px-4">
         <div className="max-w-md mx-auto">
-          {/* Menu List */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow mt-4 divide-y divide-gray-200 dark:divide-gray-700">
-            {menuItems.map((item, index) => (
-              <MenuItem
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                onClick={item.onClick}
-              />
-            ))}
-          </div>
+          {activeSection === 'menu' ? (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow mt-4 divide-y divide-gray-200 dark:divide-gray-700">
+              {menuItems.map((item, index) => (
+                <MenuItem key={index} {...item} />
+              ))}
+            </div>
+          ) : (
+            renderContent()
+          )}
         </div>
       </main>
     </div>

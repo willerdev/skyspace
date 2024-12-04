@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Settings, UserPlus, UserMinus, MessageCircle } from 'lucide-react';
+import { Settings, UserPlus, UserMinus, MessageCircle, Wallet } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserPosts } from '../services/posts';
 import { getFollowers, followUser, unfollowUser } from '../services/followers';
@@ -109,6 +109,22 @@ export default function Profile() {
             {profileData?.username}'s Profile
           </h1>
           <div className="flex items-center space-x-2">
+            {user?.id === profileUserId && (
+              <>
+                <button
+                  onClick={() => navigate('/wallet')}
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                >
+                  <Wallet className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => navigate('/settings')} 
+                  className="p-2"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+              </>
+            )}
             {user?.id !== profileUserId && (
               <>
                 <button
@@ -134,11 +150,6 @@ export default function Profile() {
                   )}
                 </button>
               </>
-            )}
-            {user?.id === profileUserId && (
-              <button onClick={() => navigate('/settings')} className="p-2">
-                <Settings className="w-5 h-5" />
-              </button>
             )}
           </div>
         </div>

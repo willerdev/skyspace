@@ -7,12 +7,14 @@ import CreatePostModal from '../components/CreatePostModal';
 import ThemeToggle from '../components/ThemeToggle';
 import { Post, Privacy } from '../types/post';
 import { supabase } from '../lib/supabase';
+import PointsTopup from '../pages/Settings/PointsTopup';
 
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const [isTopupOpen, setIsTopupOpen] = useState(false);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -82,7 +84,7 @@ export default function Home() {
             <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
               <Plus className="w-6 h-6 text-white" />
             </div>
-            <span>Create a post...</span>
+            <span>What's on your mind?</span>
           </button>
 
           {posts.length === 0 ? (
@@ -112,6 +114,15 @@ export default function Home() {
             isOpen={showCreateModal}
             onClose={() => setShowCreateModal(false)}
             onSubmit={handleCreatePost}
+          />
+
+          <button onClick={() => setIsTopupOpen(true)}>
+            Top Up Points
+          </button>
+
+          <PointsTopup 
+            isOpen={isTopupOpen} 
+            onClose={() => setIsTopupOpen(false)} 
           />
         </div>
       </main>

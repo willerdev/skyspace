@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, MoreVertical, Lock, Globe} from 'lucide-react';
+import { Heart, MessageCircle, MoreVertical, Lock, Globe, Gift } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Post } from '../types/post';
 import { likePost, unlikePost, addComment } from '../services/posts';
 import CommentModal from './CommentModal';
 import { ErrorBoundary } from './ErrorBoundary';
+import { supabase } from '../lib/supabase';
+import Modal from './Modal';
+import { givePoints } from '../services/points';
 
 interface PostCardProps {
   post: Post;
@@ -19,10 +22,26 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
   const [editedContent, setEditedContent] = useState(post.content);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [showPointsInput, setShowPointsInput] = useState(false);
+  const [pointsToGive, setPointsToGive] = useState(1);
+  const [userPoints, setUserPoints] = useState<number | null>(null);
 
   const username = post.profile?.username || 'Unknown User';
   const likesCount = post.likes?.length || 0;
   const isLiked = post.likes?.some(like => like.user_id === user?.id) || false;
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('points_balance')
+        .select('points')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          setUserPoints(data?.points ?? 0);
+        });
+    }
+  }, [user]);
 
   const handleLike = async () => {
     try {
@@ -74,6 +93,26 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating post:', error);
+    }
+  };
+
+  const handleGivePoints = async () => {
+    if (!user || pointsToGive <= 0 || pointsToGive > (userPoints ?? 0)) return;
+    
+    try {
+      await givePoints(post.id, pointsToGive);
+      
+      setUserPoints((prev) => (prev ?? 0) - pointsToGive);
+      setShowPointsInput(false);
+      setPointsToGive(1);
+      
+      onUpdate({
+        ...post,
+        points: (post.points || 0) + pointsToGive
+      });
+    } catch (error) {
+      console.error('Error giving points:', error);
+      alert('Failed to give points');
     }
   };
 
@@ -168,23 +207,37 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
         )}
 
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-4 text-gray-500 dark:text-gray-400">
-            <button
-              onClick={handleLike}
-              className={`flex items-center space-x-1 ${
-                isLiked ? 'text-pink-500' : ''
-              }`}
-            >
-              <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-              <span>{likesCount}</span>
-            </button>
-            <button 
-              onClick={() => setShowCommentModal(true)}
-              className="flex items-center space-x-1"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span>{post.comments?.length || 0}</span>
-            </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleLike}
+                className={`flex items-center space-x-1 ${
+                  isLiked ? 'text-pink-500' : ''
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                <span>{likesCount}</span>
+              </button>
+              <button 
+                onClick={() => setShowCommentModal(true)}
+                className="flex items-center space-x-1"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>{post.comments?.length || 0}</span>
+              </button>
+              <button
+                onClick={() => setShowPointsInput(true)}
+                className="flex items-center space-x-2 text-gray-500 hover:text-yellow-500 transition-colors"
+              >
+                <Gift className="w-5 h-5" />
+                <span className="font-medium">{post.points || 0}</span>
+              </button>
+            </div>
+            {userPoints !== null && (
+              <span className="text-sm text-gray-500">
+                Your Points: {userPoints}
+              </span>
+            )}
           </div>
 
           <ErrorBoundary>
@@ -197,6 +250,65 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
           </ErrorBoundary>
         </div>
       </div>
+
+      <Modal
+        isOpen={showPointsInput}
+        onClose={() => setShowPointsInput(false)}
+        title="Give Points"
+      >
+        <div className="p-4 space-y-6">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full mb-4">
+              <Gift className="w-8 h-8 text-yellow-500" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              Give Points to {post.profile?.username}
+            </h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              You have {userPoints} points available
+            </p>
+          </div>
+
+          <div className="flex items-center justify-center space-x-4">
+            <button
+              onClick={() => setPointsToGive(Math.max(1, pointsToGive - 10))}
+              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            >
+              -10
+            </button>
+            <input
+              type="number"
+              min="1"
+              max={userPoints ?? 0}
+              value={pointsToGive}
+              onChange={(e) => setPointsToGive(parseInt(e.target.value) || 0)}
+              className="w-24 px-3 py-2 text-center text-lg font-medium border rounded-lg focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <button
+              onClick={() => setPointsToGive(Math.min((userPoints ?? 0), pointsToGive + 10))}
+              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            >
+              +10
+            </button>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">
+            <button
+              onClick={() => setShowPointsInput(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleGivePoints}
+              disabled={pointsToGive <= 0 || pointsToGive > (userPoints ?? 0)}
+              className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Give Points
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
