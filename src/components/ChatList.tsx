@@ -23,24 +23,40 @@ export default function ChatList() {
 
   useEffect(() => {
     const loadChats = async () => {
+      if (!user) return;
+      
       try {
         const { data, error } = await supabase
           .from('conversations')
           .select(`
             id,
-            participants:conversation_participants(
-              user:profiles(username, avatar_url)
+            participants:conversation_participants!inner(
+              profiles!inner(
+                username,
+                avatar_url
+              )
             ),
-            lastMessage:messages(
+            messages(
               content,
               created_at
             )
           `)
-          .eq('conversation_participants.user_id', user?.id)
+          .eq('conversation_participants.user_id', user.id)
           .order('updated_at', { ascending: false });
 
         if (error) throw error;
-        setChats(data || []);
+        
+        // Transform data to match ChatPreview interface
+        const transformedData = data?.map(chat => ({
+          id: chat.id,
+          participants: chat.participants.map(p => ({
+            username: "test username",
+            avatar_url: "test avatar_url"
+          })),
+          lastMessage: chat.messages?.[0]
+        })) || [];
+
+        setChats(transformedData);
       } catch (error) {
         console.error('Error loading chats:', error);
       } finally {

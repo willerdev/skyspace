@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, Upload, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Status } from '../types/status';
 import Modal from './Modal';
+import { supabase } from '../lib/supabase';
 
 interface CreateStatusModalProps {
   isOpen: boolean;
@@ -15,6 +16,18 @@ export default function CreateStatusModal({ isOpen, onClose, onCreate }: CreateS
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<{ username: string } | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => setUserProfile(data));
+    }
+  }, [user]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,7 +53,7 @@ export default function CreateStatusModal({ isOpen, onClose, onCreate }: CreateS
       const status: Status = {
         id: crypto.randomUUID(),
         userId: user.id,
-        username: user.username,
+        username: userProfile?.username || '',
         imageUrl: imagePreview,
         createdAt: Date.now(),
         expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours from now

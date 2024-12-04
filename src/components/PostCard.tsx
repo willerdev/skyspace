@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, MoreVertical, Lock, Globe, Send } from 'lucide-react';
+import { Heart, MessageCircle, MoreVertical } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Post } from '../types/post';
 import { likePost, unlikePost, addComment } from '../services/posts';

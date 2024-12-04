@@ -31,10 +31,13 @@ export default function Chat() {
           .from('conversations')
           .select(`
             id,
-            participants:conversation_participants(
-              user:profiles(username, avatar_url)
+            participants:conversation_participants!inner(
+              profiles!inner(
+                username,
+                avatar_url
+              )
             ),
-            lastMessage:messages(
+            messages(
               content,
               created_at
             )
@@ -92,23 +95,23 @@ export default function Chat() {
                 >
                   <div className="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-medium">
-                      {chat.participants[0]?.user[0]?.username?.[0]?.toUpperCase()}
+                      {chat.participants[0]?.username?.[0]?.toUpperCase()}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium truncate">
-                        {chat.participants[0]?.user[0]?.username}
+                        {chat.participants[0]?.username}
                       </p>
                       {chat.lastMessage && (
                         <p className="text-xs text-gray-500">
-                          {new Date(chat.lastMessage[0].created_at).toLocaleDateString()}
+                          {new Date(chat.lastMessage.created_at).toLocaleDateString()}
                         </p>
                       )}
                     </div>
                     {chat.lastMessage && (
                       <p className="text-sm text-gray-500 truncate">
-                        {chat.lastMessage[0].content}
+                        {chat.lastMessage.content}
                       </p>
                     )}
                   </div>
