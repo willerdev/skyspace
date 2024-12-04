@@ -1,8 +1,7 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Home, Search, Plus, MessageCircle, User } from 'lucide-react';
 
 export default function BottomNav() {
-  const navigate = useNavigate();
   const iconClass = "w-6 h-6";
   const linkClass = "flex flex-col items-center justify-center flex-1 py-3 text-gray-500 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400";
   const activeLinkClass = "text-sky-500 dark:text-sky-400";

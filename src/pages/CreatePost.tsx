@@ -65,7 +65,7 @@ export default function CreatePost() {
     setIsLoading(true);
     
     try {
-      await createPost(content, privacy, mediaFile, mediaType);
+      await createPost(content, privacy, user.id);
       navigate('/');
     } catch (error) {
       console.error('Error creating post:', error);

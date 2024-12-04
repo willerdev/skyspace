@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Send, Image, Lock, Globe } from 'lucide-react';
+import { Image, Lock, Globe } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from './Modal';
 import { Privacy } from '../types/post';
+import { useState } from 'react';
 
 interface CreatePostModalProps {
   isOpen: boolean;

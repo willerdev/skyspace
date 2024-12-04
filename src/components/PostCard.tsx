@@ -20,12 +20,9 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
   const [showCommentModal, setShowCommentModal] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const username = post.profile?.username || 'Unknown User';
   const likesCount = post.likes?.length || 0;
-  const commentsCount = post.comments?.length || 0;
   const isLiked = post.likes?.some(like => like.user_id === user?.id) || false;
 
   const handleLike = async () => {
@@ -50,7 +47,6 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
 
   const handleComment = async (content: string) => {
     try {
-      setIsSubmitting(true);
       const comment = await addComment(post.id, content);
       onUpdate({
         ...post,
@@ -58,8 +54,6 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
       });
     } catch (error) {
       console.error('Error adding comment:', error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

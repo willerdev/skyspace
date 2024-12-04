@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import ChatWindow from '../components/ChatWindow';
+
 
 interface ChatPreview {
   id: string;
@@ -46,7 +47,18 @@ export default function Chat() {
           .order('updated_at', { ascending: false });
 
         if (error) throw error;
-        setChats(data || []);
+        const transformedData = data?.map(chat => ({
+          id: chat.id,
+          participants: chat.participants.map(p => ({
+            username: p.profiles.username,
+            avatar_url: p.profiles.avatar_url
+          })),
+          lastMessage: chat.messages?.[0] ? {
+            content: chat.messages[0].content,
+            created_at: chat.messages[0].created_at
+          } : undefined
+        })) || [];
+        setChats(transformedData);
       } catch (error) {
         console.error('Error loading chats:', error);
       } finally {
