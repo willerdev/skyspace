@@ -75,17 +75,49 @@ export async function replyToPost(commentId: string, content: string): Promise<C
   return data;
 }
 
-export async function createPost(content: string, privacy: Privacy, userId: string): Promise<Post> {
+export async function createPost(
+  content: string, 
+  privacy: Privacy, 
+  userId: string,
+  mediaFile?: File
+): Promise<Post> {
+  let mediaUrl = null;
+  let mediaType = null;
+
+  if (mediaFile) {
+    // Upload to Supabase Storage
+    const fileExt = mediaFile.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    
+    const { data, error } = await supabase.storage
+      .from('post-media')
+      .upload(fileName, mediaFile);
+
+    if (error) throw error;
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('post-media')
+      .getPublicUrl(fileName);
+
+    mediaUrl = publicUrl;
+    mediaType = mediaFile.type.startsWith('image/') ? 'image' : 'video';
+  }
+
   const { data, error } = await supabase
     .from('posts')
     .insert({
       content,
       privacy,
       user_id: userId,
+      media_url: mediaUrl,
+      media_type: mediaType
     })
     .select(`
       *,
-      profile:profiles!posts_user_id_fkey(username)
+      profile:profiles!posts_user_id_fkey(username),
+      likes,
+      comments
     `)
     .single();
 

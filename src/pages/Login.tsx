@@ -29,7 +29,7 @@ export default function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-sky-500">SkySpace</h1>
+          <h1 className="text-4xl font-bold text-sky-500">OnlyMe</h1>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">Welcome back</h2>
         </div>
         {error && (

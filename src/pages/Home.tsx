@@ -68,7 +68,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between px-4 h-14">
-          <h1 className="text-2xl font-bold text-sky-500">onlyMe</h1>
+          <h1 className="text-2xl font-bold text-sky-500">OnlyMe</h1>
           <ThemeToggle />
         </div>
       </header>
@@ -85,15 +85,15 @@ export default function Home() {
             <span>Create a post...</span>
           </button>
 
-          <div className="space-y-6">
-            {posts.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No posts yet. Create your first post!
-                </p>
-              </div>
-            ) : (
-              posts.map(post => (
+          {posts.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400">
+                No posts yet. Create your first post!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {posts.map((post, index) => (
                 <PostCard
                   key={post.id}
                   post={post}
@@ -102,10 +102,11 @@ export default function Home() {
                       p.id === updatedPost.id ? updatedPost : p
                     ));
                   }}
+                  className={`${index === posts.length - 1 ? 'mb-16' : ''}`}
                 />
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           <CreatePostModal
             isOpen={showCreateModal}

@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, MoreVertical } from 'lucide-react';
+import { Heart, MessageCircle, MoreVertical, Lock, Globe, Send } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Post } from '../types/post';
 import { likePost, unlikePost, addComment } from '../services/posts';
 import CommentModal from './CommentModal';
 import { ErrorBoundary } from './ErrorBoundary';
-import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   post: Post;
@@ -14,15 +13,17 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, onUpdate }: PostCardProps) {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
   const [showCommentModal, setShowCommentModal] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const username = post.profile?.username || 'Unknown User';
   const likesCount = post.likes?.length || 0;
+  const commentsCount = post.comments?.length || 0;
   const isLiked = post.likes?.some(like => like.user_id === user?.id) || false;
 
   const handleLike = async () => {
@@ -45,15 +46,21 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
     }
   };
 
-  const handleComment = async (content: string) => {
+  const handleComment = async () => {
+    if (!newComment.trim()) return;
+
     try {
-      const comment = await addComment(post.id, content);
+      setIsSubmitting(true);
+      const comment = await addComment(post.id, newComment.trim());
       onUpdate({
         ...post,
         comments: [...(post.comments || []), comment]
       });
+      setNewComment('');
     } catch (error) {
       console.error('Error adding comment:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -75,25 +82,24 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
     }
   };
 
-  const handleUserClick = () => {
-    navigate(`/profile/${post.user_id}`);
-  };
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       <div className="p-4">
         <div className="flex items-center justify-between">
-          <div 
-            onClick={handleUserClick}
-            className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
-          >
+          <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full" />
             <div>
               <div className="font-medium text-gray-900 dark:text-white">
                 {username}
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-1">
+                <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
+                <span>•</span>
+                {post.privacy === 'private' ? (
+                  <Lock className="w-3 h-3" />
+                ) : (
+                  <Globe className="w-3 h-3" />
+                )}
               </div>
             </div>
           </div>
