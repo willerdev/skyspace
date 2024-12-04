@@ -212,24 +212,24 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
               <button
                 onClick={handleLike}
                 className={`flex items-center space-x-1 ${
-                  isLiked ? 'text-pink-500' : ''
+                  isLiked ? 'text-white-500' : ''
                 }`}
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                <span>{likesCount}</span>
+                <Heart className={`w-5 h-5 text-gray-500 ${isLiked ? 'fill-current' : ''}`} />
+                <span className="text-gray-500">{likesCount}</span>
               </button>
               <button 
                 onClick={() => setShowCommentModal(true)}
                 className="flex items-center space-x-1"
               >
-                <MessageCircle className="w-5 h-5" />
-                <span>{post.comments?.length || 0}</span>
+                <MessageCircle className="w-5 h-5 text-gray-500" />
+                <span className="text-gray-500">{post.comments?.length || 0}</span>
               </button>
               <button
                 onClick={() => setShowPointsInput(true)}
                 className="flex items-center space-x-2 text-gray-500 hover:text-yellow-500 transition-colors"
               >
-                <Gift className="w-5 h-5" />
+                <Gift className="w-5 h-5 text-gray-500" />
                 <span className="font-medium">{post.points || 0}</span>
               </button>
             </div>
