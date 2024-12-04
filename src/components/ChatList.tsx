@@ -49,11 +49,11 @@ export default function ChatList() {
         // Transform data to match ChatPreview interface
         const transformedData = data?.map(chat => ({
           id: chat.id,
-          participants: chat.participants.map(p => ({
-            username: "test username",
-            avatar_url: "test avatar_url"
+          participants: chat.participants.map((p: any) => ({
+            username: p.profiles?.username || '',
+            avatar_url: p.profiles?.avatar_url
           })),
-          lastMessage: chat.messages?.[0]
+          lastMessage: chat.messages?.[0] || null
         })) || [];
 
         setChats(transformedData);
