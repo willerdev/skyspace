@@ -265,7 +265,7 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
               Give Points to {post.profile?.username}
             </h3>
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              You have {userPoints} points available
+              You have {userPoints} point(s) available
             </p>
           </div>
 
