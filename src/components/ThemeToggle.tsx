@@ -1,33 +1,17 @@
-import { Moon, Sun } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Sun, Moon } from 'lucide-react';
 
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    const theme = localStorage.getItem('theme');
-    return theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  });
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+    document.body.classList.toggle('dark', !isDarkMode);
+  };
 
   return (
-    <button
-      onClick={() => setIsDark(!isDark)}
-      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-      aria-label="Toggle theme"
-    >
-      {isDark ? (
-        <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-      ) : (
-        <Sun className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-      )}
+    <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+      {isDarkMode ? <Sun className="w-5 h-5 text-gray-600 dark:text-gray-400" /> : <Moon className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
     </button>
   );
 }

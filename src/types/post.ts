@@ -1,29 +1,34 @@
 export type MediaType = 'image' | 'video' | null;
 export type Privacy = 'public' | 'private';
 
+export interface Like {
+  user_id: string;
+}
+
 export interface Comment {
   id: string;
-  userId: string;
   content: string;
-  createdAt: number;
+  created_at: string;
   users: {
     username: string;
   };
-  likes?: { user_id: string }[];
+  likes?: Like[];
   replies?: Comment[];
 }
 
 export interface Post {
   id: string;
-  userId: string;
-  username: string;
   content: string;
-  mediaUrl?: string;
-  mediaType?: MediaType;
-  privacy: Privacy;  // New field
-  createdAt: number;
-  likes: string[];  // Array of userIds who liked the post
-  comments: Comment[];
+  user_id: string;
+  created_at: string;
+  privacy: 'public' | 'private';
+  media_url?: string;
+  media_type?: MediaType;
+  profile?: {
+    username: string;
+  };
+  likes?: Like[];
+  comments?: Comment[];
 }
 
 export interface Tip {

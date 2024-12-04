@@ -10,8 +10,11 @@ import Settings from './pages/Settings';
 import Security from './pages/Security';
 import Earnings from './pages/Earnings';
 import Help from './pages/Help';
+
 import Contact from './pages/Contact';
 import Chat from './pages/Chat';
+import Explore from './pages/Explore';
+import CreatePost from './pages/CreatePost';
 import ManageProfile from './pages/ManageProfile';
 
 function AppContent() {
@@ -30,7 +33,10 @@ function AppContent() {
         <Route path="/settings/help" element={<PrivateRoute><Help /></PrivateRoute>} />
         <Route path="/settings/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
         <Route path="/manage-profile" element={<PrivateRoute><ManageProfile /></PrivateRoute>} />
+        <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
         <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
+        <Route path="/explore" element={<PrivateRoute><Explore /></PrivateRoute>} />
+        <Route path="/create" element={<PrivateRoute><CreatePost /></PrivateRoute>} />
       </Routes>
       {isAuthenticated && <BottomNav />}
     </>

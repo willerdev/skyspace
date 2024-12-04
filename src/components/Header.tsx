@@ -1,4 +1,5 @@
 import NotificationBell from './NotificationBell';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   return (

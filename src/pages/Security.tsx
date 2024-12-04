@@ -4,8 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
+interface SecurityLog {
+  id: string;
+  event_type: string;
+  created_at: string;
+  user_id: string;
+}
+
 export default function Security() {
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState<SecurityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();

@@ -3,7 +3,7 @@ import { Send, Heart, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Post } from '../types/post';
 import Modal from './Modal';
-import { likeComment, unlikeComment, replyToComment } from '../services/posts';
+import { likePost, unlikePost, replyToPost } from '../services/posts';
 
 interface CommentModalProps {
   isOpen: boolean;
@@ -20,9 +20,9 @@ export default function CommentModal({ isOpen, onClose, post, onComment }: Comme
   const handleLikeComment = async (commentId: string, isLiked: boolean) => {
     try {
       if (isLiked) {
-        await unlikeComment(commentId);
+        await unlikePost(commentId);
       } else {
-        await likeComment(commentId);
+        await likePost(commentId);
       }
       // Refresh comments through parent component
       await onComment('');
@@ -36,7 +36,7 @@ export default function CommentModal({ isOpen, onClose, post, onComment }: Comme
     if (!newComment.trim() || !replyingTo) return;
 
     try {
-      await replyToComment(replyingTo, newComment.trim());
+      await replyToPost(replyingTo, newComment.trim());
       setNewComment('');
       setReplyingTo(null);
       // Refresh comments

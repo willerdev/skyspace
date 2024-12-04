@@ -4,8 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+}
+
 export default function Earnings() {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
