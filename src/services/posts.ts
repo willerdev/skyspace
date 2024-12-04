@@ -89,7 +89,7 @@ export async function createPost(
     const fileExt = mediaFile.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('post-media')
       .upload(fileName, mediaFile);
 

@@ -102,7 +102,7 @@ export default function Home() {
                       p.id === updatedPost.id ? updatedPost : p
                     ));
                   }}
-                  className={`${index === posts.length - 1 ? 'mb-16' : ''}`}
+                  // Remove className prop since it's not in PostCardProps
                 />
               ))}
             </div>

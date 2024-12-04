@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, MoreVertical, Lock, Globe, Send } from 'lucide-react';
+import { Heart, MessageCircle, MoreVertical, Lock, Globe} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Post } from '../types/post';
 import { likePost, unlikePost, addComment } from '../services/posts';
@@ -19,11 +19,9 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
   const [editedContent, setEditedContent] = useState(post.content);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const username = post.profile?.username || 'Unknown User';
   const likesCount = post.likes?.length || 0;
-  const commentsCount = post.comments?.length || 0;
   const isLiked = post.likes?.some(like => like.user_id === user?.id) || false;
 
   const handleLike = async () => {
@@ -50,7 +48,6 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
     if (!newComment.trim()) return;
 
     try {
-      setIsSubmitting(true);
       const comment = await addComment(post.id, newComment.trim());
       onUpdate({
         ...post,
@@ -59,8 +56,6 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
       setNewComment('');
     } catch (error) {
       console.error('Error adding comment:', error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
