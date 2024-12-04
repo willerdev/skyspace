@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CreditCard, Loader, Gift } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -43,6 +43,26 @@ export default function PointsTopup({ isOpen, onClose }: { isOpen: boolean; onCl
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadPoints = async () => {
+      if (!user) return;
+      setLoading(true);
+      try {
+        const { data } = await supabase
+          .from('points_balance')
+          .select('points')
+          .eq('user_id', user.id)
+          .single();
+        setUserPoints(data?.points || 0);
+      } catch (error) {
+        console.error('Error loading points:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPoints();
+  }, [user]);
 
   return (
     <div
@@ -96,7 +116,7 @@ export default function PointsTopup({ isOpen, onClose }: { isOpen: boolean; onCl
 
               <button
                 onClick={handleTopup}
-                disabled={loading}
+                disabled={loading || selectedAmount <= 0 || selectedAmount > (userPoints ?? 0)}
                 className="w-full flex items-center justify-center space-x-2 bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-lg disabled:opacity-50"
               >
                 {loading ? (

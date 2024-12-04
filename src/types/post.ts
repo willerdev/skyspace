@@ -30,6 +30,7 @@ export interface Post {
   likes?: Like[];
   comments?: Comment[];
   points?: number;
+  unlocked?: boolean;
 }
 
 export interface Tip {

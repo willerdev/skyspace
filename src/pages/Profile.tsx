@@ -4,7 +4,8 @@ import { Settings, UserPlus, UserMinus, MessageCircle, Wallet } from 'lucide-rea
 import { useAuth } from '../contexts/AuthContext';
 import { getUserPosts } from '../services/posts';
 import { getFollowers, followUser, unfollowUser } from '../services/followers';
-import PostCard from '../components/PostCard';
+import { givePoints } from '../services/points';
+
 import { supabase } from '../lib/supabase';
 import { Post } from '../types/post';
 
@@ -27,6 +28,8 @@ export default function Profile() {
     followers: 0,
     following: 0
   });
+  const [unlockedPosts, setUnlockedPosts] = useState<Set<string>>(new Set());
+  const [userPoints, setUserPoints] = useState<number>(0);
 
   const profileUserId = userId === 'me' ? user?.id : userId;
 
@@ -34,18 +37,24 @@ export default function Profile() {
     const loadProfileData = async () => {
       if (!profileUserId) return;
       try {
-        const [userPosts, userFollowers, profileInfo] = await Promise.all([
+        const [userPosts, userFollowers, profileInfo, pointsData] = await Promise.all([
           getUserPosts(profileUserId),
           getFollowers(profileUserId),
           supabase
             .from('profiles')
             .select('username, bio')
             .eq('id', profileUserId)
+            .single(),
+          supabase
+            .from('points_balance')
+            .select('points')
+            .eq('user_id', user?.id)
             .single()
         ]);
 
         setPosts(userPosts);
         setProfileData(profileInfo.data);
+        setUserPoints(pointsData.data?.points || 0);
         setStats({
           posts: userPosts.length,
           followers: userFollowers.length,
@@ -87,6 +96,24 @@ export default function Profile() {
     setPosts(currentPosts => 
       currentPosts.map(post => post.id === updatedPost.id ? updatedPost : post)
     );
+  };
+
+  const handleUnlockPost = async (postId: string) => {
+    if (userPoints < 10) return;
+    
+    try {
+      await givePoints(postId, 10);
+      setUnlockedPosts(prev => new Set([...prev, postId]));
+      setUserPoints(prev => prev - 10);
+      
+      // Use handlePostUpdate to update the post in state
+      const updatedPost = posts.find(p => p.id === postId);
+      if (updatedPost) {
+        handlePostUpdate({...updatedPost, unlocked: true});
+      }
+    } catch (error) {
+      console.error('Error unlocking post:', error);
+    }
   };
 
   if (loading) {
@@ -206,14 +233,44 @@ export default function Profile() {
             </button>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             {filteredPosts.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="col-span-2 text-center py-8 text-gray-500">
                 No {activeTab} posts yet
               </div>
             ) : (
               filteredPosts.map(post => (
-                <PostCard key={post.id} post={post} onUpdate={handlePostUpdate} />
+                <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                  {post.media_url && (
+                    <div className="aspect-square relative">
+                      <img
+                        src={post.media_url}
+                        alt={post.content}
+                        className={`w-full h-full object-cover ${
+                          post.privacy === 'private' && !unlockedPosts.has(post.id)
+                            ? 'blur-xl'
+                            : ''
+                        }`}
+                      />
+                      {post.privacy === 'private' && !unlockedPosts.has(post.id) && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                          <button
+                            onClick={() => handleUnlockPost(post.id)}
+                            disabled={userPoints < 10}
+                            className="px-4 py-2 bg-sky-500 text-white rounded-full disabled:opacity-50"
+                          >
+                            Unlock for 10 points
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <p className="text-sm text-gray-900 dark:text-white line-clamp-2">
+                      {post.content}
+                    </p>
+                  </div>
+                </div>
               ))
             )}
           </div>
