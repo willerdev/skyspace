@@ -116,9 +116,9 @@ export default function Home() {
             onSubmit={handleCreatePost}
           />
 
-          <button onClick={() => setIsTopupOpen(true)}>
+          {/* <button onClick={() => setIsTopupOpen(true)}>
             Top Up Points
-          </button>
+          </button> */}
 
           <PointsTopup 
             isOpen={isTopupOpen} 

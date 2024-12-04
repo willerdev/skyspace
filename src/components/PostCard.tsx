@@ -235,7 +235,7 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
             </div>
             {userPoints !== null && (
               <span className="text-sm text-gray-500">
-                Your Points: {userPoints}
+                Tip: {userPoints}
               </span>
             )}
           </div>
