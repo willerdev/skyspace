@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 import { Status } from '../types/status';
 import CreateStatusModal from './CreateStatusModal';
 import StatusViewModal from './StatusViewModal';
@@ -9,7 +8,6 @@ export default function StatusBar() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [viewingStatuses, setViewingStatuses] = useState<Status[] | null>(null);
   const [initialStatusIndex, setInitialStatusIndex] = useState(0);
-  const { user } = useAuth();
   const [statuses, setStatuses] = useState<Status[]>(() => {
     const saved = localStorage.getItem('statuses');
     if (!saved) return [];
