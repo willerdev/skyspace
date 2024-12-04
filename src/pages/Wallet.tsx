@@ -9,7 +9,7 @@ export default function Wallet() {
   const { user } = useAuth();
   const [points, setPoints] = useState<number>(0);
   const [money, setMoney] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+ //const [setLoading] = useState(true);
   const [converting, setConverting] = useState(false);
   const [pointsToConvert, setPointsToConvert] = useState<number>(1000);
 
@@ -38,7 +38,7 @@ export default function Wallet() {
     } catch (error) {
       console.error('Error loading balances:', error);
     } finally {
-      setLoading(false);
+     // setLoading(false);
     }
   };
 
