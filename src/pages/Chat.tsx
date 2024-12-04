@@ -49,9 +49,9 @@ export default function Chat() {
         if (error) throw error;
         const transformedData = data?.map(chat => ({
           id: chat.id,
-          participants: chat.participants.map(p => ({
-            username: p.profiles.username,
-            avatar_url: p.profiles.avatar_url
+          participants: chat.participants.map((p: any) => ({
+            username: p.profiles?.username || '',
+            avatar_url: p.profiles?.avatar_url
           })),
           lastMessage: chat.messages?.[0] ? {
             content: chat.messages[0].content,
